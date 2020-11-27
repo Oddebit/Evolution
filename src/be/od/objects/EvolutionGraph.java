@@ -7,12 +7,14 @@ import java.util.ArrayList;
 
 public class EvolutionGraph extends GameObject {
 
-    public int SCALE = 2;
-    private ArrayList<Integer> graph = new ArrayList<>();
+    public int SCALE = 1;
+    private final int bottom = y + 50;
+    private final int left = x;
+    private ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
 
-    public EvolutionGraph(int creatures) {
-        super(20, Game.HEIGHT - 55, ID.EVOLUTION_GRAPH);
-        addGeneration(creatures);
+    public EvolutionGraph(ArrayList<Integer> firstGeneration) {
+        super(20, Game.HEIGHT - 100, ID.EVOLUTION_GRAPH);
+        addGeneration(firstGeneration);
     }
 
     public void tick() {
@@ -21,9 +23,16 @@ public class EvolutionGraph extends GameObject {
 
     public void render(Graphics graphics) {
         for (int i = 0; i < graph.size(); i++) {
-            int creatures = graph.get(i);
-            graphics.setColor(new Color(255, 121, 0));
-            graphics.fillRect(x + SCALE * i, y - creatures * SCALE, SCALE, creatures * SCALE);
+            ArrayList <Integer> generation = graph.get(i);
+            int height = 0;
+            for (int j = 0; j < generation.size(); j++) {
+                int creatures = generation.get(j);
+
+                graphics.setColor(new Color(0, j * 5, j * 5));
+                graphics.fillRect(left + i * 3 * SCALE, bottom - height - creatures * SCALE, 3 * SCALE, creatures * SCALE);
+                height += creatures * SCALE;
+            }
+
         }
     }
 
@@ -31,7 +40,7 @@ public class EvolutionGraph extends GameObject {
         return new Rectangle(x, y, graph.size() * SCALE, 20 * SCALE);
     }
 
-    public void addGeneration(int creatures) {
+    public void addGeneration(ArrayList<Integer> creatures) {
         this.graph.add(creatures);
     }
 }

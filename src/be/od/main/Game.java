@@ -4,35 +4,45 @@ import be.od.objects.*;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.util.ArrayList;
 import java.util.Random;
+
+import static be.od.objects.Handler.foodPerCreature;
 
 public class Game extends Canvas implements Runnable {
 
     private static final long serialVersionUID = 1550691097823471818L;
-    
+
 
     public static final int WIDTH = 1306, HEIGHT = 708;
 
     private Thread thread;
     private boolean running = false;
-    public static final int CREATURES = 50;
+    public static final int CREATURES = 200;
 
     private Handler handler;
 
     public Game() {
         handler = new Handler();
         new Window(WIDTH, HEIGHT, "Evolution", this);
-
         Random random = new Random();
-        handler.addObject(new RepartitionGraph());
-        handler.addObject(new EvolutionGraph(CREATURES));
-        handler.addObject(new DashBoard(CREATURES));
-        for (int i = 0; i < CREATURES; i++) {
-            handler.addObject(new Creature(random.nextInt(WIDTH - 48), random.nextInt(HEIGHT - 70), (random.nextInt(4) + 1) * 4, handler));
-            for (int j = 0; j < 2; j++) {
-                handler.addObject(new Food(random.nextInt(WIDTH - 48), random.nextInt(HEIGHT - 70)));
-            }
+
+        ArrayList<Integer> speedStatistics = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            speedStatistics.add(0);
         }
+        for (int i = 0; i < CREATURES; i++) {
+            int speed = (random.nextInt(4) + 1) * 4;
+            handler.addObject(new Creature(random.nextInt(WIDTH - 48), random.nextInt(HEIGHT - 70), speed, handler));
+            speedStatistics.set(speed, speedStatistics.get(speed) + 1);
+        }
+
+        for (int i = 0; i < CREATURES * foodPerCreature; i++) {
+            handler.addObject(new Food(random.nextInt(WIDTH - 48), random.nextInt(HEIGHT - 70)));
+        }
+//        handler.addObject(new RepartitionGraph());
+        handler.addObject(new EvolutionGraph(speedStatistics));
+        handler.addObject(new DashBoard(CREATURES));
     }
 
     public synchronized void start() {

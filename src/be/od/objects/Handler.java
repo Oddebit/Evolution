@@ -13,7 +13,7 @@ public class Handler {
     public static int generation = 0;
     public static int creatures = 15;
     private int maxSpeed = 0;
-    public static final double foodPerCreature = 1.2;
+    public static final double foodPerCreature = 0.8;
     LinkedList<GameObject> objects = new LinkedList<>();
 
     public void nextGeneration() {
@@ -50,6 +50,8 @@ public class Handler {
     }
 
     public void updateStatistics() {
+
+        ArrayList<Integer> speedStatistics = getSpeedStatistics();
         for (int i = 0; i < objects.size(); i++) {
             GameObject tempObject = objects.get(i);
 
@@ -57,14 +59,14 @@ public class Handler {
                 ((DashBoard) tempObject).setGeneration(generation);
                 ((DashBoard) tempObject).setCreatures(creatures);
             } else if (tempObject.getId() == ID.EVOLUTION_GRAPH) {
-                ((EvolutionGraph) tempObject).addGeneration(Handler.creatures);
+                ((EvolutionGraph) tempObject).addGeneration(speedStatistics);
             } else if (tempObject.getId() == ID.REPARTITION_GRAPH) {
-                updateRepartition((RepartitionGraph)tempObject);
+                ((RepartitionGraph)tempObject).setGraph(speedStatistics);
             }
         }
     }
 
-    public void updateRepartition(RepartitionGraph repartitionGraph){
+    public ArrayList<Integer> getSpeedStatistics(){
         ArrayList<Integer> graph = new ArrayList<>();
         for (int i = 0; i <= maxSpeed; i++) {
             int count = 0;
@@ -76,7 +78,7 @@ public class Handler {
             }
             graph.add(count);
         }
-        repartitionGraph.setGraph(graph);
+        return graph;
     }
 
     public void resetCreatures() {

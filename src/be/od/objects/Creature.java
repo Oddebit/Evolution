@@ -11,6 +11,7 @@ public class Creature extends GameObject {
     Handler handler;
 
     private int speed;
+    public int diameter = 16;
     private static int INITIAL_ENERGY = 20_000;
 
     private int DIRECTION;
@@ -66,17 +67,17 @@ public class Creature extends GameObject {
         y += velocityY;
 
         collision();
-        energy -= Math.pow(speed, 2);
+        energy -= Math.pow(speed, 1.8);
 
         changeDirection();
     }
 
     @Override
     public void render(Graphics graphics) {
-        graphics.setColor(new Color(0, speed * 10, speed * 10));
+        graphics.setColor(new Color(0, speed * 5, speed * 5));
         graphics.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
-        graphics.fillOval(x, y, 32, 32);
-        graphics.drawString(String.valueOf(food), x, y);
+        graphics.fillOval(x, y, diameter, diameter);
+//        graphics.drawString(String.valueOf(food), x, y);
     }
 
     public void giveBirth(int times){
@@ -123,7 +124,7 @@ public class Creature extends GameObject {
 
     @Override
     public Rectangle getBounds() {
-        return new Rectangle(x, y, 32, 32);
+        return new Rectangle(x, y, diameter, diameter);
     }
 
     public int getSpeed() {

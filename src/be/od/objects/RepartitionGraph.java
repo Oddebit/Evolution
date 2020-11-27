@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class RepartitionGraph extends GameObject {
 
-    private final int SCALE = 4;
+    private final int SCALE = 1;
     private ArrayList<Integer> graph = new ArrayList<>();
 
     public RepartitionGraph() {
