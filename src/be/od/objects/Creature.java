@@ -5,28 +5,30 @@ import be.od.main.Game;
 import java.awt.*;
 import java.util.Random;
 
+import static be.od.main.Game.HEIGHT;
+import static be.od.main.Game.WIDTH;
+
 public class Creature extends GameObject {
+
 
     Random random = new Random();
     Handler handler;
 
     private int speed;
-    public int diameter = 16;
-    private static int INITIAL_ENERGY = 20_000;
+    public int diameter;
+    public static int INITIAL_ENERGY = 1_000_000;
 
-    private int DIRECTION;
-    private final int DIRECTION_UP = 0;
-    private final int DIRECTION_DOWN = 1;
-    private final int DIRECTION_LEFT = 2;
-    private final int DIRECTION_RIGHT = 3;
+    private int destinationX;
+    private int destinationY;
 
 
-    public Creature(int x, int y, int speed, Handler handler) {
+    public Creature(int x, int y, int speed, int diameter, Handler handler) {
         super(x, y, ID.CREATURE);
+        this.speed = speed;
+        this.diameter = diameter;
         this.handler = handler;
         this.energy = INITIAL_ENERGY;
-        this.speed = speed;
-        this.DIRECTION = 1;
+        setDestination();
     }
 
     @Override
@@ -35,41 +37,29 @@ public class Creature extends GameObject {
         velocityX = 0;
         velocityY = 0;
 
-        if (x <= 0) {
-            DIRECTION = 3;
+        if(destinationX > x - speed && destinationX < x + speed && destinationY > y - speed && destinationY < y + speed) {
+            setDestination();
         }
-        if (x >= Game.WIDTH - 48) {
-            DIRECTION = 2;
-        }
-        if (y <= 0) {
-            DIRECTION = 1;
-        }
-        if (y >= Game.HEIGHT - 70) {
-            DIRECTION = 0;
-        }
-
-        switch (DIRECTION) {
-            case DIRECTION_UP:
-                velocityY -= speed;
-                break;
-            case DIRECTION_DOWN:
-                velocityY += speed;
-                break;
-            case DIRECTION_LEFT:
-                velocityX -= speed;
-                break;
-            case DIRECTION_RIGHT:
-                velocityX += speed;
-                break;
+        if (destinationX < x - speed) {
+            velocityX -= speed;
+        } else if (destinationX > x + speed) {
+            velocityX += speed;
+        } else if (destinationY < y - speed) {
+            velocityY -= speed;
+        } else if (destinationY > y + speed) {
+            velocityY += speed;
         }
 
         x += velocityX;
         y += velocityY;
 
         collision();
-        energy -= Math.pow(speed, 1.8);
+        energy -= (Math.pow(speed, 4) + Math.pow(diameter, 3));
+    }
 
-        changeDirection();
+    public void setDestination() {
+        destinationX = random.nextInt(WIDTH - 48);
+        destinationY = random.nextInt(HEIGHT - 70);
     }
 
     @Override
@@ -81,30 +71,26 @@ public class Creature extends GameObject {
     }
 
     public void giveBirth(int times){
+        int mutationProb = 5;
+
         for (int i = 0; i < times; i++) {
             int probability = random.nextInt(99);
 
-            int speed = this.getSpeed();
-            if (probability < 5) {
-                speed = this.getSpeed() + 1;
-            } else if (probability < 10) {
-                speed = this.getSpeed() - 1;
+            int speed = this.speed;
+            int diameter = this.diameter;
+            if (probability < mutationProb) {
+                speed = this.speed + 1;
+            } else if (probability < 2 * mutationProb) {
+                speed = this.speed - 1;
+            } else if (probability < 4 * mutationProb) {
+                diameter = this.diameter + 1;
+            } else if (probability < 6 * mutationProb) {
+                diameter = this.diameter - 1;
             }
 
-            Creature child = new Creature(random.nextInt(Game.WIDTH - 48), random.nextInt(Game.HEIGHT - 70), speed, handler);
+            Creature child = new Creature(random.nextInt(WIDTH - 48), random.nextInt(Game.HEIGHT - 70), speed, diameter, handler);
             child.setFood(1);
             handler.addObject(child);
-        }
-    }
-
-    public void changeDirection() {
-        int turn = random.nextInt(4);
-
-        switch (turn) {
-            case 0:
-                if (++this.DIRECTION > 3) this.DIRECTION = 0;
-            case 1:
-                if (--this.DIRECTION < 0) this.DIRECTION = 3;
         }
     }
 

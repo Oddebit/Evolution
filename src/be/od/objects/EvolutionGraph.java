@@ -29,7 +29,7 @@ public class EvolutionGraph extends GameObject {
                 int creatures = generation.get(j);
 
                 graphics.setColor(new Color(0, j * 5, j * 5));
-                graphics.fillRect(left + i * 3 * SCALE, bottom - height - creatures * SCALE, 3 * SCALE, creatures * SCALE);
+                graphics.fillRect(left + i * SCALE, bottom - height - creatures * SCALE, SCALE, creatures * SCALE);
                 height += creatures * SCALE;
             }
 

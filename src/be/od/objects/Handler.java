@@ -13,7 +13,6 @@ public class Handler {
     public static int generation = 0;
     public static int creatures = 15;
     private int maxSpeed = 0;
-    public static final double foodPerCreature = 0.8;
     LinkedList<GameObject> objects = new LinkedList<>();
 
     public void nextGeneration() {
@@ -86,13 +85,14 @@ public class Handler {
             GameObject tempObject = objects.get(i);
             if (tempObject.getId() == ID.CREATURE) {
                 tempObject.setFood(0);
-                tempObject.setEnergy(5_000);
+                tempObject.setEnergy(Creature.INITIAL_ENERGY);
+                ((Creature)tempObject).setDestination();
             }
         }
     }
 
     public void resetFood() {
-        for (int i = 0; i < Game.CREATURES * foodPerCreature; i++) {
+        for (int i = 0; i < Game.CREATURES; i++) {
             this.addObject(new Food(
                     random.nextInt(Game.WIDTH - 48),
                     random.nextInt(Game.HEIGHT - 70)));

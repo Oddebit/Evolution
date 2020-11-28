@@ -7,8 +7,6 @@ import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static be.od.objects.Handler.foodPerCreature;
-
 public class Game extends Canvas implements Runnable {
 
     private static final long serialVersionUID = 1550691097823471818L;
@@ -18,7 +16,7 @@ public class Game extends Canvas implements Runnable {
 
     private Thread thread;
     private boolean running = false;
-    public static final int CREATURES = 200;
+    public static final int CREATURES = 100;
 
     private Handler handler;
 
@@ -32,15 +30,11 @@ public class Game extends Canvas implements Runnable {
             speedStatistics.add(0);
         }
         for (int i = 0; i < CREATURES; i++) {
-            int speed = (random.nextInt(4) + 1) * 4;
-            handler.addObject(new Creature(random.nextInt(WIDTH - 48), random.nextInt(HEIGHT - 70), speed, handler));
-            speedStatistics.set(speed, speedStatistics.get(speed) + 1);
+            handler.addObject(new Creature(random.nextInt(WIDTH - 48), random.nextInt(HEIGHT - 70), 12, 16,  handler));
+            speedStatistics.set(12, speedStatistics.get(12) + 1);
         }
 
-        for (int i = 0; i < CREATURES * foodPerCreature; i++) {
-            handler.addObject(new Food(random.nextInt(WIDTH - 48), random.nextInt(HEIGHT - 70)));
-        }
-//        handler.addObject(new RepartitionGraph());
+        handler.resetFood();
         handler.addObject(new EvolutionGraph(speedStatistics));
         handler.addObject(new DashBoard(CREATURES));
     }
