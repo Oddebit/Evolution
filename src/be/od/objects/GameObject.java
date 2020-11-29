@@ -9,6 +9,7 @@ public abstract class GameObject {
     protected int velocityX, velocityY;
     protected int energy;
     protected int food;
+    protected int diameter;
 
     public GameObject(int x, int y, ID id) {
         this.x = x;
@@ -79,5 +80,9 @@ public abstract class GameObject {
 
     public void setFood(int food) {
         this.food = food;
+    }
+
+    public int getDiameter() {
+        return diameter;
     }
 }

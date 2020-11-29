@@ -4,10 +4,10 @@ import java.awt.*;
 
 public class Food extends GameObject {
 
-    public int diameter = 8;
 
     public Food(int x, int y) {
         super(x, y, ID.FOOD);
+        this.diameter = 16;
     }
 
     @Override

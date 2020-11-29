@@ -13,6 +13,8 @@ public class Handler {
     public static int generation = 0;
     public static int creatures = 15;
     private int maxSpeed = 0;
+    private int maxDiameter = 0;
+    private int maxSense = 0;
     LinkedList<GameObject> objects = new LinkedList<>();
 
     public void nextGeneration() {
@@ -38,6 +40,9 @@ public class Handler {
             } else {
                 creatures++;
                 maxSpeed = Math.max(maxSpeed, ((Creature) tempObject).getSpeed());
+                maxDiameter = Math.max(maxDiameter, ((Creature) tempObject).getDiameter());
+                maxSense = Math.max(maxSense, ((Creature) tempObject).getSense());
+
                 if (tempObject.getFood() > 1) {
                     ((Creature) tempObject).giveBirth(tempObject.getFood() - 1);
                 }
@@ -51,6 +56,8 @@ public class Handler {
     public void updateStatistics() {
 
         ArrayList<Integer> speedStatistics = getSpeedStatistics();
+        ArrayList<Integer> diameterStatistics = getDiameterStatistics();
+        ArrayList<Integer> senseStatistics = getSenseStatistics();
         for (int i = 0; i < objects.size(); i++) {
             GameObject tempObject = objects.get(i);
 
@@ -58,15 +65,24 @@ public class Handler {
                 ((DashBoard) tempObject).setGeneration(generation);
                 ((DashBoard) tempObject).setCreatures(creatures);
             } else if (tempObject.getId() == ID.EVOLUTION_GRAPH) {
-                ((EvolutionGraph) tempObject).addGeneration(speedStatistics);
-            } else if (tempObject.getId() == ID.REPARTITION_GRAPH) {
-                ((RepartitionGraph)tempObject).setGraph(speedStatistics);
+                switch (((EvolutionGraph) tempObject).getType()) {
+                    case SPEED:
+                        ((EvolutionGraph) tempObject).addGeneration(speedStatistics);
+                        break;
+                    case DIAMETER:
+                        ((EvolutionGraph) tempObject).addGeneration(diameterStatistics);
+                        break;
+                    case SENSE:
+                        ((EvolutionGraph) tempObject).addGeneration(senseStatistics);
+                        break;
+                }
+
             }
         }
     }
 
     public ArrayList<Integer> getSpeedStatistics(){
-        ArrayList<Integer> graph = new ArrayList<>();
+        ArrayList<Integer> speedStatistics = new ArrayList<>();
         for (int i = 0; i <= maxSpeed; i++) {
             int count = 0;
             for (int j = 0; j < objects.size(); j++) {
@@ -75,9 +91,39 @@ public class Handler {
                     if (((Creature) tempObject).getSpeed() == i) count ++;
                 }
             }
-            graph.add(count);
+            speedStatistics.add(count);
         }
-        return graph;
+        return speedStatistics;
+    }
+
+    public ArrayList<Integer> getDiameterStatistics(){
+        ArrayList<Integer> diameterStatistics = new ArrayList<>();
+        for (int i = 0; i <= maxDiameter; i++) {
+            int count = 0;
+            for (int j = 0; j < objects.size(); j++) {
+                GameObject tempObject = objects.get(j);
+                if (tempObject.getId() == ID.CREATURE) {
+                    if (((Creature) tempObject).getDiameter() == i) count ++;
+                }
+            }
+            diameterStatistics.add(count);
+        }
+        return diameterStatistics;
+    }
+
+    public ArrayList<Integer> getSenseStatistics(){
+        ArrayList<Integer> senseStatistics = new ArrayList<>();
+        for (int i = 0; i <= maxSense; i++) {
+            int count = 0;
+            for (int j = 0; j < objects.size(); j++) {
+                GameObject tempObject = objects.get(j);
+                if (tempObject.getId() == ID.CREATURE) {
+                    if (((Creature) tempObject).getSense() == i) count ++;
+                }
+            }
+            senseStatistics.add(count);
+        }
+        return senseStatistics;
     }
 
     public void resetCreatures() {
