@@ -21,6 +21,8 @@ public class Creature extends GameObject {
     private int destinationX;
     private int destinationY;
 
+    public static final int speedShade = 10;
+
 
     public Creature(int x, int y, int speed, int diameter, int sense, Handler handler) {
         super(x, y, ID.CREATURE);
@@ -167,7 +169,7 @@ public class Creature extends GameObject {
     }
 
     public Color getColor() {
-        int shade = Math.min(255, speed * 8);
+        int shade = Math.min(255, speed * speedShade);
         return new Color(0, shade, shade);
     }
 }

@@ -10,12 +10,14 @@ import java.util.Random;
 public class Handler {
 
     Random random = new Random();
+    LinkedList<GameObject> objects = new LinkedList<>();
+
     public static int generation = 0;
     public static int creatures = 15;
+
     private int maxSpeed = 0;
     private int maxDiameter = 0;
     private int maxSense = 0;
-    LinkedList<GameObject> objects = new LinkedList<>();
 
     public void nextGeneration() {
         generation++;

@@ -4,62 +4,57 @@ import be.od.objects.*;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
-import java.util.ArrayList;
 import java.util.Random;
 
 public class Game extends Canvas implements Runnable {
 
     private static final long serialVersionUID = 1550691097823471818L;
 
+    private Handler handler;
+    private Menu menu;
+    private Thread thread;
+    private boolean running = false;
+
     public static final int WIDTH = 1306, HEIGHT = 708;
     public static final int REAL_WIDTH = WIDTH - 48, REAL_HEIGHT = HEIGHT - 70;
+    public static final int WIDTH_CENTER = REAL_WIDTH / 2, HEIGHT_CENTER = REAL_HEIGHT / 2;
     public static final double BORDER_PROPORTION = 0.03;
     public static final int WIDTH_BORDER = (int) (REAL_WIDTH * BORDER_PROPORTION), HEIGHT_BORDER = (int) (REAL_HEIGHT * BORDER_PROPORTION);
     public static final int BORDER_WIDTH = REAL_WIDTH - 2 * WIDTH_BORDER, BORDER_HEIGHT = REAL_HEIGHT - 2 * HEIGHT_BORDER;
+    public static final int GRAPH_HEIGHT = 50;
 
-    private Thread thread;
-    private boolean running = false;
+
     public static final int CREATURES = 100;
-    private final int INITIAL_SPEED = 12;
-    private final int INITIAL_DIAMETER = 16;
-    private final int INITIAL_SENSE = 100;
+    public static final int INITIAL_SPEED = 12;
+    public static final int INITIAL_DIAMETER = 16;
+    public static final int INITIAL_SENSE = 100;
 
-    private Handler handler;
+    public enum State {
+        MENU, GAME, GAME_OVER
+    }
+
+    public State gameState = State.MENU;
 
     public Game() {
         handler = new Handler();
+        menu = new Menu(this, handler);
+        this.addMouseListener(menu);
+
         new Window(WIDTH, HEIGHT, "Evolution", this);
         Random random = new Random();
-
-        ArrayList<Integer> speedStatistics = new ArrayList<>();
-        ArrayList<Integer> diameterStatistics = new ArrayList<>();
-        ArrayList<Integer> senseStatistics = new ArrayList<>();
-
-        for (int i = 0; i <= INITIAL_SPEED; i++) {
-            speedStatistics.add(0);
-        }
-        for (int i = 0; i <= INITIAL_DIAMETER; i++) {
-            diameterStatistics.add(0);
-        }
-        for (int i = 0; i <= INITIAL_SENSE; i++) {
-            senseStatistics.add(0);
-        }
 
         for (int i = 0; i < CREATURES; i++) {
             handler.addObject(new Creature(random.nextInt(WIDTH - 48),
                     random.nextInt(HEIGHT - 70),
-                    INITIAL_SPEED, INITIAL_DIAMETER, INITIAL_SENSE,  handler));
-            speedStatistics.set(INITIAL_SPEED, speedStatistics.get(INITIAL_SPEED) + 1);
-            diameterStatistics.set(INITIAL_DIAMETER, diameterStatistics.get(INITIAL_DIAMETER) + 1);
-            senseStatistics.set(INITIAL_SENSE, senseStatistics.get(INITIAL_SENSE) + 1);
+                    INITIAL_SPEED, INITIAL_DIAMETER, INITIAL_SENSE, handler));
         }
 
         handler.resetFood();
         final int graphs = 3;
         final int graphWidth = (BORDER_WIDTH - (graphs + 1) * WIDTH_BORDER) / graphs;
-        handler.addObject(new EvolutionGraph(Game.WIDTH_BORDER, graphWidth, EvolutionGraph.Type.SPEED, speedStatistics));
-        handler.addObject(new EvolutionGraph(2 * WIDTH_BORDER + graphWidth, graphWidth, EvolutionGraph.Type.DIAMETER, diameterStatistics));
-        handler.addObject(new EvolutionGraph(3 * WIDTH_BORDER + 2 * graphWidth, graphWidth, EvolutionGraph.Type.SENSE, senseStatistics));
+        handler.addObject(new EvolutionGraph(Game.WIDTH_BORDER, graphWidth, GRAPH_HEIGHT, EvolutionGraph.Type.SPEED));
+        handler.addObject(new EvolutionGraph(2 * WIDTH_BORDER + graphWidth, graphWidth, GRAPH_HEIGHT, EvolutionGraph.Type.DIAMETER));
+        handler.addObject(new EvolutionGraph(3 * WIDTH_BORDER + 2 * graphWidth, graphWidth, GRAPH_HEIGHT, EvolutionGraph.Type.SENSE));
         handler.addObject(new DashBoard(CREATURES));
     }
 
@@ -114,7 +109,12 @@ public class Game extends Canvas implements Runnable {
     }
 
     private void tick() {
-        handler.tick();
+
+        if(gameState == State.GAME) {
+            handler.tick();
+        } else {
+            menu.tick();
+        }
     }
 
     private void render() {
@@ -129,7 +129,19 @@ public class Game extends Canvas implements Runnable {
         graphics.setColor(Color.black);
         graphics.fillRect(0, 0, WIDTH, HEIGHT);
 
-        handler.render(graphics);
+        if (gameState == State.GAME) {
+            graphics.setColor(new Color(250, 120, 0));
+            graphics.setFont(new Font(Font.DIALOG, Font.BOLD, 32));
+            String string = "Menu";
+            int stringHeight = graphics.getFontMetrics().getHeight();
+            int stringWidth = graphics.getFontMetrics().stringWidth(string);
+            graphics.drawString("Menu", BORDER_WIDTH - stringWidth, HEIGHT_BORDER + stringHeight);
+        }
+        if (gameState == State.GAME) {
+            handler.render(graphics);
+        } else if (gameState == State.MENU) {
+            menu.render(graphics);
+        }
 
         graphics.dispose();
         bufferStrategy.show();
